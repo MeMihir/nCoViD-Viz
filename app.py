@@ -70,6 +70,19 @@ app.layout = html.Div([
             multi=False
         ),
         dcc.Graph(id="map-graph")
+    ]),
+    html.Div([
+        html.Div([
+            html.H3('Select Country : '),
+            dcc.Dropdown(
+                id='countrySpreadPlot',
+                options=countries,
+                value="India",
+                multi=False
+            )
+        ]),
+        dcc.Graph(id="spreadPlot"),
+        dcc.Graph(id="spreadPlotDaily")
     ])
 ])
 
@@ -81,6 +94,20 @@ def make_map(disp_map):
                     animation_frame='DateStr',
                     # color_continuous_scale="peach", 
                     title=f'Countries with {disp_map} Cases')
+
+@app.callback(Output("spreadPlot", "figure"), [Input('countrySpreadPlot', 'value')])
+def make_spread_plot(country):
+    print(country)
+    spread_data = df_country[df_country['Country']==country]
+    spread_data.set_index('Date', inplace=True)
+    # fig = 
+    return spread_data[['Confirmed', 'Deaths', 'Recovered']].iplot(kind='spread', asFigure=True)
+
+@app.callback(Output("spreadPlotDaily", "figure"), [Input('countrySpreadPlot', 'value')])
+def make_spread_plot(country):
+    spread_data = df_country[df_country['Country']==country]
+    spread_data.set_index('Date', inplace=True)
+    return spread_data[['ConfirmedPerDay', 'DeathsPerDay', 'RecoveredPerDay']].iplot(kind='spread', asFigure=True)
 
 
 if __name__ == '__main__':
