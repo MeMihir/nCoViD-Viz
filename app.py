@@ -10,7 +10,6 @@ import plotly.express as px
 import cufflinks as cf
 
 
-
 def non_cumulative(l):
     for i in range (len(l)-1, 0, -1):
         l[i] -= l[i-1]
@@ -53,7 +52,7 @@ map_df['DateStr'] = map_df['Date'].apply(lambda x: str(x).split(' ')[0])
 map_df.sort_values(by='Date', inplace=True)
 
 
-app = dash.Dash()
+app = dash.Dash(__name__)
 
 mapOptions = [{'label': 'Confirmed', 'value': 'Confirmed'}, {'label': 'Deaths', 'value': 'Deaths'}, {'label': 'Active', 'value': 'Active'}, {'label': 'Recovered', 'value': 'Recovered'}]
 countries = [{'label': country, 'value': country} for country in df_country['Country'].unique()]
@@ -66,7 +65,8 @@ app.layout = html.Div([
             id='mapsDispType',
             options=mapOptions,
             value='Confirmed',
-            multi=False
+            multi=False,
+            className="dropdown"
         ),
         dcc.Graph(id="map-graph")
     ]),
