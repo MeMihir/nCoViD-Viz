@@ -52,7 +52,6 @@ map_df = df_country.copy()
 map_df['DateStr'] = map_df['Date'].apply(lambda x: str(x).split(' ')[0])
 map_df.sort_values(by='Date', inplace=True)
 
-print(map_df.columns)
 
 app = dash.Dash()
 
@@ -72,6 +71,13 @@ app.layout = html.Div([
         dcc.Graph(id="map-graph")
     ]),
     html.Div([
+        html.H1('Improvement'),
+        dcc.Graph(
+            id = 'logPlot',            
+            figure = px.line(df_country, x='Confirmed', y='ConfirmedPerDay', color='Country', log_x=True, log_y=True)
+        )
+    ]),
+    html.Div([
         html.Div([
             html.H3('Select Country : '),
             dcc.Dropdown(
@@ -83,6 +89,26 @@ app.layout = html.Div([
         ]),
         dcc.Graph(id="spreadPlot"),
         dcc.Graph(id="spreadPlotDaily")
+    ]),
+    html.Div([
+        html.Div([
+        html.H3('Select Type of Display : '),
+        dcc.Dropdown( 
+            id='barDispType',
+            options=mapOptions,
+            value='Confirmed',
+            multi=False
+        )
+    ]),
+        html.Div([
+            dcc.Dropdown(
+            id='barDispSum',
+            options=[{'label': 'PerDay', 'value':'PerDay'}, {'label' : 'Cumulative', 'value': ''}],
+            value='',
+            multi=False
+        )
+        ]),
+        dcc.Graph(id="barPlot")
     ])
 ])
 
@@ -97,18 +123,21 @@ def make_map(disp_map):
 
 @app.callback(Output("spreadPlot", "figure"), [Input('countrySpreadPlot', 'value')])
 def make_spread_plot(country):
-    print(country)
     spread_data = df_country[df_country['Country']==country]
     spread_data.set_index('Date', inplace=True)
     # fig = 
     return spread_data[['Confirmed', 'Deaths', 'Recovered']].iplot(kind='spread', asFigure=True)
 
 @app.callback(Output("spreadPlotDaily", "figure"), [Input('countrySpreadPlot', 'value')])
-def make_spread_plot(country):
+def make_daily_spread_plot(country):
     spread_data = df_country[df_country['Country']==country]
     spread_data.set_index('Date', inplace=True)
     return spread_data[['ConfirmedPerDay', 'DeathsPerDay', 'RecoveredPerDay']].iplot(kind='spread', asFigure=True)
 
+@app.callback(Output("barPlot", "figure"), [Input('barDispType', 'value'), Input('barDispSum', 'value')])
+def make_bar_plot(dispType, dispSum):
+    print(dispSum, dispType)
+    return px.bar(df_country, x='Date', y=f'{dispType}{dispSum}', color='Country')
 
 if __name__ == '__main__':
     app.run_server(host='127.0.0.1', port='8051', debug=True)
