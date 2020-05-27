@@ -5,6 +5,7 @@ from dash.dependencies import Input, Output, State
 
 import numpy as np
 import pandas as pd
+from pandas_datareader import data
 from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 import plotly.express as px
 import cufflinks as cf
@@ -27,6 +28,36 @@ def sort_by_country(country):
     temp_df['Country'] = [country]*temp_df.shape[0]
     return temp_df
 
+# stocks20 = data.DataReader(companies, 'yahoo', f'2020{start_date}', f'2020{end_date}')
+# stocks19 = data.DataReader(companies, 'yahoo', f'2019{start_date}', f'2019{end_date}')
+# stocks18 = data.DataReader(companies, 'yahoo', f'2018{start_date}', f'2018{end_date}')
+
+def stockCompare(company, attr='Close'):
+    start_date = '-01-15'
+    end_date = '-05-24'
+
+    stocks20 = data.DataReader(company, 'yahoo', f'2020{start_date}', f'2020{end_date}')
+    stocks19 = data.DataReader(company, 'yahoo', f'2019{start_date}', f'2019{end_date}')
+    stocks18 = data.DataReader(company, 'yahoo', f'2018{start_date}', f'2018{end_date}')
+
+    stocks18 = pd.DataFrame(stocks18[attr])
+    stocks18.columns = ['2018']
+    stocks18['DDMM'] = pd.Series(stocks18.index.values).apply(lambda x: '2020-'+str(x).split(' ')[0][5:]).values
+
+    stocks19 = pd.DataFrame(stocks19[attr])
+    stocks19.columns = ['2019']
+    stocks19['DDMM'] = pd.Series(stocks19.index.values).apply(lambda x: '2020-'+str(x).split(' ')[0][5:]).values
+
+    stocks20 = pd.DataFrame(stocks20[attr])
+    stocks20.columns = ['2020']
+    stocks20['DDMM'] = pd.Series(stocks20.index.values).apply(lambda x: '2020-'+str(x).split(' ')[0][5:]).values
+
+    compare = pd.merge(left=stocks18, right=stocks19, on='DDMM', how='outer')
+    compare = pd.merge(left=compare, right=stocks20, on='DDMM', how='outer')
+    compare.set_index('DDMM', inplace=True)
+    compare.sort_index(inplace=True)
+    compare.fillna(method='ffill', inplace=True)
+    return compare
 
 
 # df = pd.read_csv('./covid_19_data.csv')
@@ -50,6 +81,11 @@ df['RecoveredPerDay'] = non_cumulative(df['Recovered'].copy())
 map_df = df_country.copy()
 map_df['DateStr'] = map_df['Date'].apply(lambda x: str(x).split(' ')[0])
 map_df.sort_values(by='Date', inplace=True)
+
+dates = pd.Series(df_country['Date'].unique())
+total_cases = df_country[['Confirmed','ConfirmedPerDay', 'Deaths','DeathsPerDay', 'Recovered','RecoveredPerDay', 'Active', 'Date']]
+total_cases = total_cases.groupby('Date').sum()
+
 
 
 app = dash.Dash(__name__)
@@ -112,6 +148,18 @@ app.layout = html.Div([
         )
         ]),
         dcc.Graph(id="barPlot")
+    ]),
+
+    html.Div([
+        html.Div([
+            dcc.Input(
+                id='company_stock_ip',
+                value='AMZN',
+                debounce=True
+            ),
+        ]),
+        dcc.Graph(id='stock_spread'),
+        dcc.Graph(id='covid_stock_spread')
     ])
 ])
 
@@ -139,8 +187,32 @@ def make_daily_spread_plot(country):
 
 @app.callback(Output("barPlot", "figure"), [Input('barDispType', 'value'), Input('barDispSum', 'value')])
 def make_bar_plot(dispType, dispSum):
-    print(dispSum, dispType)
     return px.bar(df_country, x='Date', y=f'{dispType}{dispSum}', color='Country')
+
+@app.callback(Output('stock_spread', 'figure'), [Input('company_stock_ip', 'value')])
+def make_stock_spread_plot(company):
+    company_stocks = stockCompare(company)
+    # company_name = yf.Ticker(company)
+    # print(company, type(company), company_name.info['longName'])
+    return company_stocks[['2020', '2018', '2019']].iplot(
+        kind='spread', 
+        asFigure=True, 
+        # title=company_name.info['longName']
+    )
+
+@app.callback(Output('covid_stock_spread', 'figure'), [Input('company_stock_ip', 'value')])
+def make_covid_stock_spread(company):
+    company_stocks = stockCompare(company)
+    stocks_affect = total_cases.join(company_stocks)
+    stocks_affect['ConfirmedPerDay'] = stocks_affect['ConfirmedPerDay']/max(stocks_affect['ConfirmedPerDay'])
+    stocks_affect['2020'] = stocks_affect['2020']/max(stocks_affect['2020'])
+    stocks_affect.columns.values[-1] = 'Stock Value'
+    return stocks_affect[['ConfirmedPerDay', '2020']].iplot(kind='spread', asFigure=True)
+
 
 if __name__ == '__main__':
     app.run_server(host='127.0.0.1', port='8051', debug=True)
+
+#     configure_plotly_browser_state()
+# init_notebook_mode(connected=True)
+# stocks_affect[['ConfirmedPerDay', '2020']].iplot(kind='spread')
