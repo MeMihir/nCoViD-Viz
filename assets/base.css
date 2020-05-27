@@ -1,4 +1,16 @@
-#mapsDispType {
-    /* height: 80vh; */
-    /* background-color: red; */
+body{
+    font-family: monospace;
+}
+#_dash-app-content{
+    padding: 20px;
+}
+.app--title,.app--subt{
+    text-align: center;
+}
+.Select-control,.Select-menu-outer{
+    width: 20vw;
+    margin-bottom: 10px;
+}
+.inline-t{
+    display: inline;
 }

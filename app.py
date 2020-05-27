@@ -58,7 +58,9 @@ mapOptions = [{'label': 'Confirmed', 'value': 'Confirmed'}, {'label': 'Deaths', 
 countries = [{'label': country, 'value': country} for country in df_country['Country'].unique()]
 
 app.layout = html.Div([
-    html.H1('CoViD-19 Visualization.'),
+    html.H1('Data Visualization CSE3020', className="app--title"),
+    html.H3('These are a few visualizations of the widespread pandemic COVID19. Presented by - Ananya Ganesh [18BCE0139], Mihir Pavuskar [18BCE0159], Aashraya Singhal [18BCE0171]', className = "app--subt"),
+    html.H1('COVID19 Visualization Timeline'),
     html.Div([
         html.H3('Select Type of Display : '),
         dcc.Dropdown( 
@@ -72,6 +74,7 @@ app.layout = html.Div([
     ]),
     html.Div([
         html.H1('Improvement'),
+        html.H3('The following graph is a logarithmic plot of the timeline of COVID19. You can double-click on the countries on the right to view their inidividual timeline'),
         dcc.Graph(
             id = 'logPlot',            
             figure = px.line(df_country, x='Confirmed', y='ConfirmedPerDay', color='Country', log_x=True, log_y=True)
