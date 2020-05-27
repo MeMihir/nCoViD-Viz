@@ -61,7 +61,7 @@ def stockCompare(company, attr='Close'):
 
 
 # df = pd.read_csv('./covid_19_data.csv')
-df = pd.read_csv('./covid_19_data/covid_19_data.csv')
+df = pd.read_csv('https://raw.githubusercontent.com/MeMihir/nCoViD-Viz/master/covid_19_data/covid_19_data.csv')
 df['Active'] = df['Confirmed'] - df['Deaths'] - df['Recovered']
 df['ObservationDate'] = pd.to_datetime(df['ObservationDate'])
 
