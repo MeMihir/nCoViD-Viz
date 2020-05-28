@@ -85,7 +85,7 @@ dates = pd.Series(df_country['Date'].unique())
 total_cases = df_country[['Confirmed','ConfirmedPerDay', 'Deaths','DeathsPerDay', 'Recovered','RecoveredPerDay', 'Active', 'Date']]
 total_cases = total_cases.groupby('Date').sum()
 
-stocks_df = pd.read_csv('./covid_19_data/NASDAQcompanylist.csv')
+stocks_df = pd.read_csv('https://raw.githubusercontent.com/MeMihir/nCoViD-Viz/master/covid_19_data/NASDAQcompanylist.csv')
 stock_options = []
 for tic in stocks_df.index:
     val = stocks_df.loc[tic]
