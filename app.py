@@ -94,6 +94,8 @@ for tic in stocks_df.index:
 
 app = dash.Dash(__name__)
 
+app.title = 'nCoViD Visualization | Visualizing CoViD19 cases around the world'
+
 mapOptions = [{'label': 'Confirmed', 'value': 'Confirmed'}, {'label': 'Deaths', 'value': 'Deaths'}, {'label': 'Active', 'value': 'Active'}, {'label': 'Recovered', 'value': 'Recovered'}]
 countries = [{'label': country, 'value': country} for country in df_country['Country'].unique()]
 
