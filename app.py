@@ -117,7 +117,14 @@ app.layout = html.Div([
         html.H3('The following graph is a logarithmic plot of the timeline of COVID19. You can double-click on the countries on the right to view their inidividual timeline'),
         dcc.Graph(
             id = 'logPlot',            
-            figure = px.line(df_country, x='Confirmed', y='ConfirmedPerDay', color='Country', log_x=True, log_y=True)
+            figure = px.line(
+                df_country,
+                x='Confirmed',
+                y='ConfirmedPerDay',
+                color='Country',
+                log_x=True, log_y=True,
+                title='Logistic Plot'
+            )
         )
     ]),
     html.Div([
@@ -187,21 +194,34 @@ def make_spread_plot(country):
     spread_data = df_country[df_country['Country']==country]
     spread_data.set_index('Date', inplace=True)
     # fig = 
-    return spread_data[['Confirmed', 'Deaths', 'Recovered']].iplot(kind='spread', asFigure=True)
+    return spread_data[['Confirmed', 'Deaths', 'Recovered']].iplot(
+        kind='spread', 
+        asFigure=True,
+        title= f'Spread plot of Cumulative cases in {country}'
+    )
 
 @app.callback(Output("spreadPlotDaily", "figure"), [Input('countrySpreadPlot', 'value')])
 def make_daily_spread_plot(country):
     spread_data = df_country[df_country['Country']==country]
     spread_data.set_index('Date', inplace=True)
-    return spread_data[['ConfirmedPerDay', 'DeathsPerDay', 'RecoveredPerDay']].iplot(kind='spread', asFigure=True)
+    return spread_data[['ConfirmedPerDay', 'DeathsPerDay', 'RecoveredPerDay']].iplot(
+        kind='spread',
+        asFigure=True,
+        title= f'Spread plot of Daily cases in {country}'
+    )
 
 @app.callback(Output("barPlot", "figure"), [Input('barDispType', 'value'), Input('barDispSum', 'value')])
 def make_bar_plot(dispType, dispSum):
-    return px.bar(df_country, x='Date', y=f'{dispType}{dispSum}', color='Country')
+    return px.bar(
+        df_country,
+        x='Date',
+        y=f'{dispType}{dispSum}',
+        color='Country',
+        title=f'EPI Curve of {dispSum} {dispType} cases'
+    )
 
 @app.callback(Output('stock_spread', 'figure'), [Input('company_stock_ip', 'value'), Input('company_stock_ip_others', 'value')])
 def make_stock_spread_plot(company, company_other):
-    print(company, company_other)
     if(company=='OTHER'):
         company = company_other
     company_stocks = stockCompare(company)
@@ -209,7 +229,8 @@ def make_stock_spread_plot(company, company_other):
     # print(company, type(company), company_name.info['longName'])
     return company_stocks[['2020', '2018', '2019']].iplot(
         kind='spread', 
-        asFigure=True, 
+        asFigure=True,
+        title=f'Stocks Comparision of {company}'
         # title=company_name.info['longName']
     )
 
@@ -222,7 +243,11 @@ def make_covid_stock_spread(company, company_other):
     stocks_affect['ConfirmedPerDay'] = stocks_affect['ConfirmedPerDay']/max(stocks_affect['ConfirmedPerDay'])
     stocks_affect['2020'] = stocks_affect['2020']/max(stocks_affect['2020'])
     stocks_affect.columns.values[-1] = 'Stock Value'
-    return stocks_affect[['ConfirmedPerDay', '2020']].iplot(kind='spread', asFigure=True)
+    return stocks_affect[['ConfirmedPerDay', '2020']].iplot(
+        kind='spread', 
+        asFigure=True,
+        title=f'Effect of CoViD Cases on {company} stock price'
+    )
 
 
 if __name__ == '__main__':
