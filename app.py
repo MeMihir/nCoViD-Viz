@@ -92,7 +92,9 @@ for tic in stocks_df.index:
     stock_options.append({'label':'{} - {}'.format(val['Symbol'], val['Name']), 'value':val['Symbol']})
 
 
+
 app = dash.Dash(__name__)
+server = app.server
 
 app.title = 'nCoViD Visualization | Visualizing CoViD19 cases around the world'
 
