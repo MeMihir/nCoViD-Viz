@@ -287,7 +287,7 @@ def make_stock_spread_plot(company, company_other):
 
 
 if __name__ == '__main__':
-    app.run_server(host='127.0.0.1', port='8051', debug=True)
+    app.run_server()
 
 #     configure_plotly_browser_state()
 # init_notebook_mode(connected=True)
