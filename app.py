@@ -1,7 +1,12 @@
+import os
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
+
+app = dash.Dash(__name__)
+server = app.server
+app.title = 'nCoViD Visualization | Visualizing CoViD19 cases around the world'
 
 import numpy as np
 import pandas as pd
@@ -90,13 +95,6 @@ stock_options = []
 for tic in stocks_df.index:
     val = stocks_df.loc[tic]
     stock_options.append({'label':'{} - {}'.format(val['Symbol'], val['Name']), 'value':val['Symbol']})
-
-
-
-app = dash.Dash(__name__)
-server = app.server
-
-app.title = 'nCoViD Visualization | Visualizing CoViD19 cases around the world'
 
 mapOptions = [{'label': 'Confirmed', 'value': 'Confirmed'}, {'label': 'Deaths', 'value': 'Deaths'}, {'label': 'Active', 'value': 'Active'}, {'label': 'Recovered', 'value': 'Recovered'}]
 countries = [{'label': country, 'value': country} for country in df_country['Country'].unique()]
@@ -268,27 +266,5 @@ def make_stock_spread_plot(company, company_other):
     return company_stocks_graph, stocks_affect_graph
 
 
-
-
-# @app.callback(Output('covid_stock_spread', 'figure'), [Input('company_stock_ip', 'value'), Input('company_stock_ip_others', 'value')])
-# def make_covid_stock_spread(company, company_other):
-#     if(company=='OTHER'):
-#         company = company_other
-#     company_stocks = stockCompare(company)
-#     stocks_affect = total_cases.join(company_stocks)
-#     stocks_affect['ConfirmedPerDay'] = stocks_affect['ConfirmedPerDay']/max(stocks_affect['ConfirmedPerDay'])
-#     stocks_affect['2020'] = stocks_affect['2020']/max(stocks_affect['2020'])
-#     stocks_affect.columns.values[-1] = 'Stock Value'
-#     return stocks_affect[['ConfirmedPerDay', '2020']].iplot(
-#         kind='spread', 
-#         asFigure=True,
-#         title=f'Effect of CoViD Cases on {company} stock price'
-#     )
-
-
 if __name__ == '__main__':
     app.run_server()
-
-#     configure_plotly_browser_state()
-# init_notebook_mode(connected=True)
-# stocks_affect[['ConfirmedPerDay', '2020']].iplot(kind='spread')
