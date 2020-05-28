@@ -196,28 +196,34 @@ def make_map(disp_map):
                     # color_continuous_scale="peach", 
                     title=f'Countries with {disp_map} Cases')
 
-@app.callback(Output("spreadPlot", "figure"), [Input('countrySpreadPlot', 'value')])
+@app.callback(
+    [Output("spreadPlot", "figure"), 
+    Output("spreadPlotDaily", "figure")], 
+    [Input('countrySpreadPlot', 'value')]
+)
 def make_spread_plot(country):
     spread_data = df_country[df_country['Country']==country]
     spread_data.set_index('Date', inplace=True)
-    # fig = 
-    return spread_data[['Confirmed', 'Deaths', 'Recovered']].iplot(
+
+    spread_plot = spread_data[['Confirmed', 'Deaths', 'Recovered']].iplot(
         kind='spread', 
         asFigure=True,
         title= f'Spread plot of Cumulative cases in {country}'
     )
 
-@app.callback(Output("spreadPlotDaily", "figure"), [Input('countrySpreadPlot', 'value')])
-def make_daily_spread_plot(country):
-    spread_data = df_country[df_country['Country']==country]
-    spread_data.set_index('Date', inplace=True)
-    return spread_data[['ConfirmedPerDay', 'DeathsPerDay', 'RecoveredPerDay']].iplot(
+    spread_plot_daily = spread_data[['ConfirmedPerDay', 'DeathsPerDay', 'RecoveredPerDay']].iplot(
         kind='spread',
         asFigure=True,
         title= f'Spread plot of Daily cases in {country}'
     )
 
-@app.callback(Output("barPlot", "figure"), [Input('barDispType', 'value'), Input('barDispSum', 'value')])
+    return spread_plot, spread_plot_daily
+
+@app.callback(
+    Output("barPlot", "figure"), 
+    [Input('barDispType', 'value'), 
+    Input('barDispSum', 'value')]
+)
 def make_bar_plot(dispType, dispSum):
     return px.bar(
         df_country,
@@ -227,34 +233,53 @@ def make_bar_plot(dispType, dispSum):
         title=f'EPI Curve of {dispSum} {dispType} cases'
     )
 
-@app.callback(Output('stock_spread', 'figure'), [Input('company_stock_ip', 'value'), Input('company_stock_ip_others', 'value')])
+@app.callback(
+    [Output('stock_spread', 'figure'), 
+    Output('covid_stock_spread', 'figure')], 
+    [Input('company_stock_ip', 'value'), 
+    Input('company_stock_ip_others', 'value')]
+)
 def make_stock_spread_plot(company, company_other):
     if(company=='OTHER'):
         company = company_other
     company_stocks = stockCompare(company)
-    # company_name = yf.Ticker(company)
-    # print(company, type(company), company_name.info['longName'])
-    return company_stocks[['2020', '2018', '2019']].iplot(
+    
+    company_stocks_graph = company_stocks[['2020', '2018', '2019']].iplot(
         kind='spread', 
         asFigure=True,
         title=f'Stocks Comparision of {company}'
-        # title=company_name.info['longName']
     )
 
-@app.callback(Output('covid_stock_spread', 'figure'), [Input('company_stock_ip', 'value'), Input('company_stock_ip_others', 'value')])
-def make_covid_stock_spread(company, company_other):
-    if(company=='OTHER'):
-        company = company_other
-    company_stocks = stockCompare(company)
     stocks_affect = total_cases.join(company_stocks)
     stocks_affect['ConfirmedPerDay'] = stocks_affect['ConfirmedPerDay']/max(stocks_affect['ConfirmedPerDay'])
     stocks_affect['2020'] = stocks_affect['2020']/max(stocks_affect['2020'])
     stocks_affect.columns.values[-1] = 'Stock Value'
-    return stocks_affect[['ConfirmedPerDay', '2020']].iplot(
+    
+    stocks_affect_graph = stocks_affect[['ConfirmedPerDay', '2020']].iplot(
         kind='spread', 
         asFigure=True,
         title=f'Effect of CoViD Cases on {company} stock price'
     )
+
+    return company_stocks_graph, stocks_affect_graph
+
+
+
+
+# @app.callback(Output('covid_stock_spread', 'figure'), [Input('company_stock_ip', 'value'), Input('company_stock_ip_others', 'value')])
+# def make_covid_stock_spread(company, company_other):
+#     if(company=='OTHER'):
+#         company = company_other
+#     company_stocks = stockCompare(company)
+#     stocks_affect = total_cases.join(company_stocks)
+#     stocks_affect['ConfirmedPerDay'] = stocks_affect['ConfirmedPerDay']/max(stocks_affect['ConfirmedPerDay'])
+#     stocks_affect['2020'] = stocks_affect['2020']/max(stocks_affect['2020'])
+#     stocks_affect.columns.values[-1] = 'Stock Value'
+#     return stocks_affect[['ConfirmedPerDay', '2020']].iplot(
+#         kind='spread', 
+#         asFigure=True,
+#         title=f'Effect of CoViD Cases on {company} stock price'
+#     )
 
 
 if __name__ == '__main__':
