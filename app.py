@@ -101,6 +101,7 @@ app.layout = html.Div([
     html.H1('Data Visualization CSE3020', className="app--title"),
     html.H3('These are a few visualizations of the widespread pandemic COVID19. Presented by - Ananya Ganesh [18BCE0139], Mihir Pavuskar [18BCE0159], Aashraya Singhal [18BCE0171]', className = "app--subt"),
     html.H1('COVID19 Visualization Timeline'),
+    html.P('Press the play button to see an animation of the spread of COVID19 globally. You can zoom in and out and move around the map as well.'),
     html.Div([
         html.H3('Select Type of Display : '),
         dcc.Dropdown( 
@@ -128,6 +129,8 @@ app.layout = html.Div([
         )
     ]),
     html.Div([
+        html.H1('Country-Specific'),
+        html.H3('Select a Country and view its COVID timeline. You can select a section of the graph to zoom in as well.'),
         html.Div([
             html.H3('Select Country : '),
             dcc.Dropdown(
@@ -141,6 +144,8 @@ app.layout = html.Div([
         dcc.Graph(id="spreadPlotDaily")
     ]),
     html.Div([
+        html.H1('Customizable'),
+        html.H3('The following graph is an EPI Curve, it can be customized using the dropdowns below and on clicking a country to view the country specifics.'),
         html.Div([
         html.H3('Select Type of Display : '),
         dcc.Dropdown( 
@@ -162,6 +167,8 @@ app.layout = html.Div([
     ]),
 
     html.Div([
+        html.H1('Financial Hit'),
+        html.H3('COVID19 has hit the market! It has affected the companies and a lot of people have lost their jobs as well. The below graphs are a Spread Plot of the stock prices of the company and how COVID has affected the company over time.'),
         html.Div([
             dcc.Dropdown(
                 id='company_stock_ip',
