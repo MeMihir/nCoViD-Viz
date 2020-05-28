@@ -10,7 +10,6 @@ from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 import plotly.express as px
 import cufflinks as cf
 
-
 def non_cumulative(l):
     for i in range (len(l)-1, 0, -1):
         l[i] -= l[i-1]
@@ -86,6 +85,11 @@ dates = pd.Series(df_country['Date'].unique())
 total_cases = df_country[['Confirmed','ConfirmedPerDay', 'Deaths','DeathsPerDay', 'Recovered','RecoveredPerDay', 'Active', 'Date']]
 total_cases = total_cases.groupby('Date').sum()
 
+stocks_df = pd.read_csv('./covid_19_data/NASDAQcompanylist.csv')
+stock_options = []
+for tic in stocks_df.index:
+    val = stocks_df.loc[tic]
+    stock_options.append({'label':'{} - {}'.format(val['Symbol'], val['Name']), 'value':val['Symbol']})
 
 
 app = dash.Dash(__name__)
@@ -152,9 +156,15 @@ app.layout = html.Div([
 
     html.Div([
         html.Div([
-            dcc.Input(
+            dcc.Dropdown(
                 id='company_stock_ip',
                 value='AMZN',
+                options=stock_options,
+                multi=False
+            ),
+            dcc.Input(
+                id='company_stock_ip_others',
+                value='^BSESN',
                 debounce=True
             ),
         ]),
@@ -189,8 +199,11 @@ def make_daily_spread_plot(country):
 def make_bar_plot(dispType, dispSum):
     return px.bar(df_country, x='Date', y=f'{dispType}{dispSum}', color='Country')
 
-@app.callback(Output('stock_spread', 'figure'), [Input('company_stock_ip', 'value')])
-def make_stock_spread_plot(company):
+@app.callback(Output('stock_spread', 'figure'), [Input('company_stock_ip', 'value'), Input('company_stock_ip_others', 'value')])
+def make_stock_spread_plot(company, company_other):
+    print(company, company_other)
+    if(company=='OTHER'):
+        company = company_other
     company_stocks = stockCompare(company)
     # company_name = yf.Ticker(company)
     # print(company, type(company), company_name.info['longName'])
@@ -200,8 +213,10 @@ def make_stock_spread_plot(company):
         # title=company_name.info['longName']
     )
 
-@app.callback(Output('covid_stock_spread', 'figure'), [Input('company_stock_ip', 'value')])
-def make_covid_stock_spread(company):
+@app.callback(Output('covid_stock_spread', 'figure'), [Input('company_stock_ip', 'value'), Input('company_stock_ip_others', 'value')])
+def make_covid_stock_spread(company, company_other):
+    if(company=='OTHER'):
+        company = company_other
     company_stocks = stockCompare(company)
     stocks_affect = total_cases.join(company_stocks)
     stocks_affect['ConfirmedPerDay'] = stocks_affect['ConfirmedPerDay']/max(stocks_affect['ConfirmedPerDay'])
