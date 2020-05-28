@@ -1,6 +1,6 @@
 name: dash_app
 dependencies:
-  - python=3.6
+  - python=3.7
   - pip:
     - dash
     - dash-renderer
@@ -8,3 +8,6 @@ dependencies:
     - dash-html-components
     - plotly
     - gunicorn
+    - pandas
+    - pandas_datareader
+    - cufflinks
