@@ -267,4 +267,4 @@ def make_stock_spread_plot(company, company_other):
 
 
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(host='ncovidviz.herokuapp.com', debug=True)
