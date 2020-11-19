@@ -33,7 +33,7 @@ def sort_by_country(country):
 
 def stockCompare(company, attr='Close'):
     start_date = '-01-15'
-    end_date = '-05-24'
+    end_date = '-06-04'
 
     stocks20 = data.DataReader(company, 'yahoo', f'2020{start_date}', f'2020{end_date}')
     stocks19 = data.DataReader(company, 'yahoo', f'2019{start_date}', f'2019{end_date}')
@@ -60,7 +60,7 @@ def stockCompare(company, attr='Close'):
 
 
 # df = pd.read_csv('./covid_19_data.csv')
-df = pd.read_csv('https://raw.githubusercontent.com/MeMihir/nCoViD-Viz/master/covid_19_data/covid_19_data.csv')
+df = pd.read_csv('./covid_19_data/covid_19_data.csv')
 df['Active'] = df['Confirmed'] - df['Deaths'] - df['Recovered']
 df['ObservationDate'] = pd.to_datetime(df['ObservationDate'])
 
@@ -93,13 +93,14 @@ for tic in stocks_df.index:
 
 
 app = dash.Dash(__name__)
+server = app.server
 
 mapOptions = [{'label': 'Confirmed', 'value': 'Confirmed'}, {'label': 'Deaths', 'value': 'Deaths'}, {'label': 'Active', 'value': 'Active'}, {'label': 'Recovered', 'value': 'Recovered'}]
 countries = [{'label': country, 'value': country} for country in df_country['Country'].unique()]
 
 app.layout = html.Div([
     html.H1('Data Visualization CSE3020', className="app--title"),
-    html.H3('These are a few visualizations of the widespread pandemic COVID19. Presented by - Ananya Ganesh [18BCE0139], Mihir Pavuskar [18BCE0159], Aashraya Singhal [18BCE0171]', className = "app--subt"),
+    html.H3('These are a few visualizations of the widespread pandemic COVID19. Presented by - Ananya Ganesh [18BCE0139], Mihir Pavuskar [18BCE0159], Aashraya Singal [18BCE0171]', className = "app--subt"),
     html.H1('COVID19 Visualization Timeline'),
     html.P('Press the play button to see an animation of the spread of COVID19 globally. You can zoom in and out and move around the map as well.'),
     html.Div([
@@ -263,27 +264,8 @@ def make_stock_spread_plot(company, company_other):
 
     return company_stocks_graph, stocks_affect_graph
 
-
-
-
-# @app.callback(Output('covid_stock_spread', 'figure'), [Input('company_stock_ip', 'value'), Input('company_stock_ip_others', 'value')])
-# def make_covid_stock_spread(company, company_other):
-#     if(company=='OTHER'):
-#         company = company_other
-#     company_stocks = stockCompare(company)
-#     stocks_affect = total_cases.join(company_stocks)
-#     stocks_affect['ConfirmedPerDay'] = stocks_affect['ConfirmedPerDay']/max(stocks_affect['ConfirmedPerDay'])
-#     stocks_affect['2020'] = stocks_affect['2020']/max(stocks_affect['2020'])
-#     stocks_affect.columns.values[-1] = 'Stock Value'
-#     return stocks_affect[['ConfirmedPerDay', '2020']].iplot(
-#         kind='spread', 
-#         asFigure=True,
-#         title=f'Effect of CoViD Cases on {company} stock price'
-#     )
-
-
 if __name__ == '__main__':
-    app.run_server(host='127.0.0.1', port='8051', debug=True)
+    app.run_server(debug=False)
 
 #     configure_plotly_browser_state()
 # init_notebook_mode(connected=True)
