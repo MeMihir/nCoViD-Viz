@@ -1,6 +1,17 @@
 body{
     font-family: monospace;
+    padding: 5% 7.5%;
+    background-color: black;
+    color: white;
 }
+
+.Select-value, .Select-menu-outer, .Select-value-label {
+    background-color: black;
+    color: white !important;
+    border-color: white;
+}
+
+
 #_dash-app-content{
     padding: 40px;
     margin: 0 15vw;

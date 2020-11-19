@@ -101,7 +101,7 @@ countries = [{'label': country, 'value': country} for country in df_country['Cou
 
 app.layout = html.Div([
     html.H1('Data Visualization CSE3020', className="app--title"),
-    html.H3('These are a few visualizations of the widespread pandemic COVID19. Presented by - Ananya Ganesh [18BCE0139], Mihir Pavuskar [18BCE0159], Aashraya Singal [18BCE0171]', className = "app--subt"),
+    # html.H3('These are a few visualizations of the widespread pandemic COVID19. Presented by - Ananya Ganesh [18BCE0139], Mihir Pavuskar [18BCE0159], Aashraya Singal [18BCE0171]', className = "app--subt"),
     html.H1('COVID19 Visualization Timeline'),
     html.P('Press the play button to see an animation of the spread of COVID19 globally. You can zoom in and out and move around the map as well.'),
     html.Div([
@@ -125,6 +125,7 @@ app.layout = html.Div([
                 x='Confirmed',
                 y='ConfirmedPerDay',
                 color='Country',
+                template='plotly_dark',
                 log_x=True, log_y=True,
                 title='Logistic Plot'
             )
@@ -195,7 +196,7 @@ def make_map(disp_map):
                     locationmode='country names', color=disp_map, 
                     hover_name="Country", 
                     animation_frame='DateStr',
-                    # color_continuous_scale="peach", 
+                    template='plotly_dark',
                     title=f'Countries with {disp_map} Cases')
 
 @app.callback(
@@ -210,12 +211,14 @@ def make_spread_plot(country):
     spread_plot = spread_data[['Confirmed', 'Deaths', 'Recovered']].iplot(
         kind='spread', 
         asFigure=True,
+        theme='space',
         title= f'Spread plot of Cumulative cases in {country}'
     )
 
     spread_plot_daily = spread_data[['ConfirmedPerDay', 'DeathsPerDay', 'RecoveredPerDay']].iplot(
         kind='spread',
         asFigure=True,
+        theme='space',
         title= f'Spread plot of Daily cases in {country}'
     )
 
@@ -231,6 +234,7 @@ def make_bar_plot(dispType, dispSum):
         df_country,
         x='Date',
         y=f'{dispType}{dispSum}',
+        template='plotly_dark',
         color='Country',
         title=f'EPI Curve of {dispSum} {dispType} cases'
     )
@@ -249,6 +253,7 @@ def make_stock_spread_plot(company, company_other):
     company_stocks_graph = company_stocks[['2020', '2018', '2019']].iplot(
         kind='spread', 
         asFigure=True,
+        theme='space',
         title=f'Stocks Comparision of {company}'
     )
 
@@ -260,6 +265,7 @@ def make_stock_spread_plot(company, company_other):
     stocks_affect_graph = stocks_affect[['ConfirmedPerDay', '2020']].iplot(
         kind='spread', 
         asFigure=True,
+        theme='space',
         title=f'Effect of CoViD Cases on {company} stock price'
     )
 
