@@ -38,7 +38,7 @@ def sort_by_country(country):
 
 def stockCompare(company, attr='Close'):
     start_date = '-01-15'
-    end_date = '-06-04'
+    end_date = '-15-11'
 
     stocks20 = data.DataReader(company, 'yahoo', f'2020{start_date}', f'2020{end_date}')
     stocks19 = data.DataReader(company, 'yahoo', f'2019{start_date}', f'2019{end_date}')
